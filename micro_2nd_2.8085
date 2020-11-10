@@ -1,0 +1,75 @@
+START:
+MVI D,FFH
+MOV A,D
+STA 3000H		; аявийа ока сбгста
+MVI E,4BH		; E = 75 (летягтгс циа 15sec)
+LXI B,00C8H		; BC = 200ms
+MAIN:
+CALL GET_LSB         ; йакы тг яоутима циа ма паяы то LSB 
+CPI 00H 		 ; пеяилемы то пяыто OFF
+JZ FIRST_OFF         ; ам еяхеи паы стгм FIRST_OFF (OFF)
+CALL DELB            ; аккиыс ежаялофы тгм йахустеягсг 
+JMP MAIN             ; йаи пеяилемы левяи то 1О OFF
+
+FIRST_OFF:
+CALL GET_LSB         ; йакы тг яоутима циа ма паяы то LSB
+CPI 01H		 ; пеяилемы то ON лета апо то OFF 
+JZ FIRST_ON          ; ам еяхеи паы стгм FIRST_ON (OFF-ON)
+CALL DELB            ; аккиыс ежаялофы тгм йахустеягсг
+JMP FIRST_OFF        ; йаи пеяилемы левяи то 1О ON
+
+FIRST_ON:
+CALL GET_LSB         ; йакы тг яоутима циа ма паяы то LSB 
+CPI 00H 		 ; пеяилемы то 2О OFF
+JZ NEXT_OFF          ; ам еяхеи паы стгм NEXT_OFF (OFF-ON-OFF)
+CALL DELB            ; аккиыс ежаялофы тгм йахустеягсг
+JMP FIRST_ON         ; йаи пеяилемы то 2О ON  
+
+NEXT_OFF:
+CALL GET_LSB         ; йакы тг яоутима циа ма паяы то LSB
+CPI 01H              ; пеяилемы то ом лета то OFF
+JZ NEXT_ON		 ; ам еяхеи паы стгм мевт_ом (оFF-ON-OFF-ON)
+CALL LABEL		 ; аккиыс йакы тгм LABEL 
+CALL DELB            ; ежаялофы тгм йахустеягсг
+DCR E 			 ; йаи леиымы то вяомолетяо йата 200ms
+MOV A,E            
+CPI 00H 		 ; ам дем евоум пеяасеи та 15 secs
+JNZ NEXT_OFF		 ; епамакалбамы йаи пеяилемы ма пеяасоум
+CALL TURN_OFF	        ; аккиыс йакы тг яоутима поу сбгмеи та калпайиа
+JMP MAIN		 ; йаи епистяежы стгм MAIN
+
+NEXT_ON:
+CALL GET_LSB         ; йакы тг яоутима циа ма паяы то LSB
+CPI 00H 		 ; пеяилемы то 3О OFF
+JZ ANOTHER_OFF	 ; AN еяхеи паы стгм ANOTHER_OFF
+CALL LABEL 	        ; аккиыс йакы тгм LABEL
+CALL DELB            ; ежаялофы тгм йахустеягсг
+DCR E 			 ; йаи леиымы то вяомолетяо йата 200ms
+MOV A,E
+CPI FFH
+JNZ NEXT_ON          ; епамакалбамы йаи пеяилемы ма пеяасоум
+CALL TURN_OFF        ; аккиыс йакы тг яоутима поу сбгмеи та калпайиа
+JMP MAIN
+
+ANOTHER_OFF:
+MVI E,4BH		 ; епамахеты то вяомолетяо ста 15sec
+JMP NEXT_OFF          
+
+LABEL:
+MOV A,D
+CMA
+MOV D,A
+STA 3000H
+RET
+
+TURN_OFF:           ; яоутима циа ма сбгсы ока та калпайиа
+MVI A,FFH
+STA 3000H
+RET
+
+GET_LSB:            ; яоутима циа ма паяы то LSB
+LDA 2000H		
+ANI 01H
+RET
+
+END

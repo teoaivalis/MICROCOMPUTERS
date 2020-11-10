@@ -1,0 +1,175 @@
+IN 10H            ; DISABLE MEMORY PROTECTION
+LXI H,0A02H       ; деивмы стгм хесг 0а02
+MVI M,10H         
+INX H             ; деивмы сто еполемо йеки тгс лмглгс 
+MVI M,10H         
+INX H             ; деивмы сто еполемо йеки тгс лмглгс
+MVI M,10H         
+INX H             ; деивмы сто еполемо йеки тгс лмглгс
+MVI M,10H  
+
+
+       
+START:
+
+LINE_0:           ; евоуле INSTR STEP, FETCH PC, HDWR STEP
+
+MVI A,FEH
+STA 2800H         ; диабафы цяаллг
+LDA 1800H         ; диабафы стгкг
+ANI 07H           ; йамы та 5 MSB лгдем 
+MVI C,86H         
+CPI 06H           ; INSTR STEP
+JZ DISPLAY
+MVI C,85H 
+CPI 05H           ; FETCH PC
+JZ DISPLAY
+MVI C,F7H
+CPI 03H           ; HDWR STEP
+JZ DISPLAY
+
+
+LINE_1:           ; евоуле RUN, FETCH REG, FETCH ADRS
+
+MVI A,FDH
+STA 2800H         ; диабафы цяаллг
+LDA 1800H         ; диабафы стгкг
+ANI 07H           ; йамы та 5 MSB лгдем 
+MVI C,84H
+CPI 06H           ; RUN
+JZ DISPLAY
+MVI C,80H
+CPI 05H           ; FETCH REG
+JZ DISPLAY
+MVI C,82H
+CPI 03H           ; FETCH ADRS
+JZ DISPLAY
+
+
+LINE_2:           ; евоуле 0, STORE/INCR, INCR
+
+MVI A,FBH
+STA 2800H         ; диабафы цяаллг
+LDA 1800H         ; диабафы стгкг
+ANI 07H           ; йамы та 5 MSB лгдем 
+MVI C,00H
+CPI 06H           ; 0
+JZ DISPLAY
+MVI C,83H
+CPI 05H           ; STORE/INCR
+JZ DISPLAY
+MVI C,81H
+CPI 03H           ;INCR
+JZ DISPLAY
+
+
+LINE_3:           ; евоуле 1, 2, 3
+
+MVI A,F7H
+STA 2800H         ; диабафы цяаллг
+LDA 1800H         ; диабафы стгкг
+ANI 07H           ; йамы та 5 MSB лгдем 
+MVI C,01H
+CPI 06H           ; 1
+JZ DISPLAY
+MVI C,02H
+CPI 05H           ; 2
+JZ DISPLAY
+MVI C,03H
+CPI 03H           ; 3
+JZ DISPLAY
+
+
+LINE_4:           ; евоуле 4, 5, 6
+
+MVI A,EFH
+STA 2800H         ; диабафы цяаллг
+LDA 1800H         ; диабафы стгкг
+ANI 07H           ; йамы та 5 MSB лгдем 
+MVI C,04H
+CPI 06H           ; 4
+JZ DISPLAY
+MVI C,05H
+CPI 05H           ; 5
+JZ DISPLAY
+MVI C,06H
+CPI 03H           ; 6
+JZ DISPLAY
+
+ 
+LINE_5:           ; евоуле 7, 8, 9
+
+MVI A,DFH
+STA 2800H         ; диабафы цяаллг
+LDA 1800H         ; диабафы стгкг
+ANI 07H           ; йамы та 5 MSB лгдем 
+MVI C,07H
+CPI 06H           ; 7
+JZ DISPLAY
+MVI C,08H
+CPI 05H           ; 8
+JZ DISPLAY
+MVI C,09H
+CPI 03H           ; 9
+JZ DISPLAY
+
+
+LINE_6:           ; евоуле A, B, C
+
+MVI A,BFH
+STA 2800H         ; диабафы цяаллг
+LDA 1800H         ; диабафы стгкг
+ANI 07H           ; йамы та 5 MSB лгдем 
+MVI C,0AH
+CPI 06H           ; A
+JZ DISPLAY
+MVI C,0BH
+CPI 05H           ; B
+JZ DISPLAY
+MVI C,0CH
+CPI 03H           ; C
+JZ DISPLAY
+
+
+LINE_7:           ; евоуле D, E, F
+
+MVI A,7FH
+STA 2800H         ; диабафы цяаллг
+LDA 1800H         ; диабафы стгкг
+ANI 07H
+MVI C,0DH
+CPI 06H           ; D
+JZ DISPLAY
+MVI C,0EH 
+CPI 05H           ; E
+JZ DISPLAY
+MVI C,0FH
+CPI 03H           ; F
+JZ DISPLAY
+
+
+JMP START         ; ам дем евеи патгхеи йапоио йоулпи паеи стгм аявг йаи намаекецвеи
+
+
+DISPLAY:
+
+LXI H,0A06H       ;
+MOV A,C           ; о C евеи то йыдийа тоу йоулпиоу йаи том летажеяы сто а
+ANI 0FH           ; аполомымы та 4 LSB
+MOV M,A           ; апохгйеуы стгм лмглг том A
+INX H             ; деивмы сто еполемо йеки лмглгс
+MOV A,C           ; о C евеи то йыдийа тоу йоулпиоу йаи том летажеяы сто а
+ANI F0H           ; аполомымы та 4 MSB
+RRC            
+RRC               ; йамы окисхгсг ста 4 LSB
+RRC
+RRC
+MOV M,A           ; апохгйеуы стгм лмглг том A
+LXI D,0A02H       ; H диеухумсг лмглгс поу еимаи то message
+CALL STDM         
+CALL DCD
+
+JMP START
+
+
+END
